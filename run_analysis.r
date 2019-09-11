@@ -63,5 +63,5 @@ aggregate(merged_data[, 2:(ncol(merged_data)-1)], list(merged_data$subject,merge
 colnames(tidyData_aggregated)<-c("subject","activity_names",colnames(tidyData_aggregated[3:ncol(merged_data)]))
 
 #Write this tidy dataset to a file
-fwrite(x = tidyData_aggregated, file = "tidyData_aggregated.txt", quote = FALSE,sep="~", row.name=FALSE)
+write.table(x = tidyData_aggregated, file = "tidyData_aggregated.txt", quote = FALSE,sep="~", row.name=FALSE)
 
