@@ -36,14 +36,17 @@ merged_data<-cbind(subject_data,x_data,y_data)
 colnames(merged_data)<-col_names
 
 #Extract only the measurements on the mean and standard deviation for each measurement
-mean_std_data<-merged_data[grepl("mean|stdnames",col_names)]
+mean_std_data<-merged_data[grepl("mean\\(\\)|std\\(\\)|^subject$|^activity$",col_names)]
 
-#get  descriptive activity names and add a column to name the activities in the data set
+#getdescriptive activity names and add a column to name the activities in the data set generated above
 activity_labels<-read.table("UCI HAR Dataset/activity_labels.txt")
 
-activity_names<-activity_labels[merged_data$activity,2]
-merged_data<-cbind(merged_data,activity_names)
+activity_names<-activity_labels[mean_std_data$activity,2]
+mean_std_data<-cbind(mean_std_data,activity_names)
 
+mean_std_data<-mean_std_data[ , !names(mean_std_data)== "activity"]
+
+merged_data<-mean_std_data
 #Appropriately label the data set with descriptive variable names
 names(merged_data)<-gsub("^t", "time", names(merged_data))
 names(merged_data)<-gsub("^f", "frequency", names(merged_data))
@@ -56,9 +59,9 @@ names(merged_data)<-gsub("arCoeff\\(\\)", "Autorregresion_coefficients()", names
 
 #Create a second, independent tidy data set with the average of each variable for each activity and each subject
 tidyData_aggregated<-
-aggregate(merged_data[, 2:562], list(merged_data$subject,merged_data$activity,merged_data$activity_names), mean)
-colnames(tidyData_aggregated)<-c("subject","activity","activity_names",colnames(tidyData_aggregated[4:564]))
+aggregate(merged_data[, 2:(ncol(merged_data)-1)], list(merged_data$subject,merged_data$activity_names), mean)
+colnames(tidyData_aggregated)<-c("subject","activity_names",colnames(tidyData_aggregated[3:ncol(merged_data)]))
 
 #Write this tidy dataset to a file
-fwrite(x = tidyData_aggregated, file = "tidyData_aggregated.txt", quote = FALSE,sep="~")
+fwrite(x = tidyData_aggregated, file = "tidyData_aggregated.txt", quote = FALSE,sep="~", row.name=FALSE)
 
